@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Пікір қалдыру және мәселе туралы хабарлау</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Защита от выделения текста */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #1e293b;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* iOS Liquid Glass Style */
+        .ios-glass {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.75));
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        /* Rotating Ornament Background */
+        @keyframes spinOrnament {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .rotating-ornament {
+            animation: spinOrnament 40s linear infinite;
+            mix-blend-mode: multiply;
+            filter: contrast(110%);
+        }
+
+        /* Fullscreen Loading Curtain for Transitions */
+        #loadingCurtain {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #loadingCurtain.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Star Rating Hover & Active Animation */
+        .star-rating i {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
+        }
+        .star-rating i:hover {
+            transform: scale(1.25);
+        }
+
+        #f12Modal {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between p-4 sm:p-6 md:p-8 relative min-h-screen">
+
+    <!-- Soft Background Music -->
+    <audio id="bgMusic" src="km.wav" loop preload="auto"></audio>
+
+    <!-- Smooth Fullscreen Loading Curtain -->
+    <div id="loadingCurtain" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+        <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <span class="text-slate-600 text-sm font-medium tracking-wide">Жүктелуде...</span>
+    </div>
+
+    <!-- Protected Modal Warning (F12 Lock) -->
+    <div id="f12Modal" class="fixed inset-0 z-50 bg-slate-900/30 backdrop-blur-md flex items-center justify-center opacity-0 pointer-events-none p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center transform scale-90 transition-all duration-300">
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Қорғалған жүйе</h3>
+            <p class="text-sm text-slate-600 leading-relaxed font-medium mb-6">Бастапқы код жабық. Хабарлама 3 секундтан кейін жабылады...</p>
+            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div id="modalProgress" class="bg-blue-600 h-full w-full transition-all duration-3000 ease-linear rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal Notification -->
+    <div id="successModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-md flex items-center justify-center opacity-0 pointer-events-none p-4 transition-all duration-300">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-slate-100 text-center transform scale-90 transition-all duration-300" id="successModalBox">
+            <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Пікіріңіз жіберілді!</h3>
+            <p class="text-sm text-slate-600 font-medium mb-2">Кері байланысыңызға рақмет!</p>
+            <span class="text-xs text-slate-400">Басты бетке қайтуда...</span>
+        </div>
+    </div>
+
+    <!-- Extra Large Rotating Kazakh Ornament -->
+    <div class="fixed -bottom-24 -left-24 sm:-bottom-32 sm:-left-32 md:-bottom-40 md:-left-40 z-0 pointer-events-none opacity-75">
+        <img src="ojy.jpg" alt="Қазақ орнаменті" class="w-[350px] h-[350px] sm:w-[500px] sm:h-[500px] md:w-[650px] md:h-[650px] object-contain rotating-ornament" onerror="this.style.display='none';">
+    </div>
+
+    <!-- Top Bar: Back Button -->
+    <header class="w-full max-w-3xl mx-auto flex justify-start items-center mb-4 relative z-10">
+        <button onclick="navigateTo('index.html')" class="ios-glass px-4 py-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex items-center space-x-2 cursor-pointer text-slate-700 hover:text-blue-600 shadow-sm" title="Артқа қайту">
+            <i class="fa-solid fa-arrow-left text-sm"></i>
+            <span class="text-xs sm:text-sm font-medium">Басты бетке</span>
+        </button>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-3xl mx-auto flex flex-col items-center my-auto py-4 relative z-10">
+        
+        <!-- Form Glass Container -->
+        <div class="ios-glass w-full rounded-[32px] p-6 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden">
+            
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shadow-inner shrink-0">
+                    <i class="fa-solid fa-flag"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-800">Кері байланыс және бағалау</h1>
+                    <p class="text-xs sm:text-sm text-slate-500 font-medium">Сайтты жақсартуға көмектесіңіз</p>
+                </div>
+            </div>
+
+            <form id="feedbackForm" onsubmit="submitForm(event)" class="space-y-6">
+                
+                <!-- Question 1 -->
+                <div class="bg-white/70 p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">
+                        1. Сайттың жалпы жұмысы мен дизайнын қалай бағалайсыз?
+                    </label>
+                    <div class="star-rating flex items-center space-x-2 text-2xl text-slate-300 cursor-pointer" data-question="q1">
+                        <i class="fa-solid fa-star" onclick="setRating('q1', 1)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q1', 2)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q1', 3)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q1', 4)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q1', 5)"></i>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="bg-white/70 p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">
+                        2. Модульдерді пайдалану сізге қаншалықты ынғайлы болды?
+                    </label>
+                    <div class="star-rating flex items-center space-x-2 text-2xl text-slate-300 cursor-pointer" data-question="q2">
+                        <i class="fa-solid fa-star" onclick="setRating('q2', 1)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q2', 2)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q2', 3)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q2', 4)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q2', 5)"></i>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="bg-white/70 p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">
+                        3. Беттердің жүктелу жылдамдығы мен анимациялар сапасы:
+                    </label>
+                    <div class="star-rating flex items-center space-x-2 text-2xl text-slate-300 cursor-pointer" data-question="q3">
+                        <i class="fa-solid fa-star" onclick="setRating('q3', 1)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q3', 2)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q3', 3)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q3', 4)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q3', 5)"></i>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="bg-white/70 p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">
+                        4. Жүйеде қандай да бір қателіктер немесе мәселелер кездесті ме?
+                    </label>
+                    <div class="star-rating flex items-center space-x-2 text-2xl text-slate-300 cursor-pointer mb-3" data-question="q4">
+                        <i class="fa-solid fa-star" onclick="setRating('q4', 1)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q4', 2)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q4', 3)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q4', 4)"></i>
+                        <i class="fa-solid fa-star" onclick="setRating('q4', 5)"></i>
+                    </div>
+                    <textarea placeholder="Қосымша пікіріңіз немесе мәселені сипаттаңыз (міндетті емес)..." class="w-full p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-blue-500 bg-white/80 resize-none h-20 transition-all"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Пікірді жіберу</span>
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-7xl mx-auto text-center py-4 relative z-10">
+        <a href="https://zerde-faq.github.io" target="_self" class="inline-flex items-center text-xs sm:text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors">
+            <i class="fa-solid fa-paperclip mr-1.5 text-slate-400"></i> zerde-faq.github.io
+        </a>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        // Start Background Music at 20% Volume
+        window.addEventListener('load', () => {
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.volume = 0.2;
+            
+            const startMusic = () => {
+                bgMusic.play().then(() => {
+                    document.removeEventListener('click', startMusic);
+                    document.removeEventListener('touchstart', startMusic);
+                }).catch(() => {});
+            };
+
+            bgMusic.play().catch(() => {
+                document.addEventListener('click', startMusic);
+                document.addEventListener('touchstart', startMusic);
+            });
+        });
+
+        // Interactive Star Rating Logic
+        const ratings = { q1: 0, q2: 0, q3: 0, q4: 0 };
+
+        function setRating(question, value) {
+            ratings[question] = value;
+            const container = document.querySelector(`.star-rating[data-question="${question}"]`);
+            const stars = container.querySelectorAll('i');
+
+            stars.forEach((star, index) => {
+                if (index < value) {
+                    star.classList.remove('text-slate-300');
+                    star.classList.add('text-amber-400');
+                } else {
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-slate-300');
+                }
+            });
+        }
+
+        // Submit Dummy Form Action
+        function submitForm(event) {
+            event.preventDefault();
+            
+            const modal = document.getElementById('successModal');
+            const box = document.getElementById('successModalBox');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+            box.classList.remove('scale-90');
+            box.classList.add('scale-100');
+
+            setTimeout(() => {
+                navigateTo('index.html');
+            }, 2000);
+        }
+
+        // Smooth Navigation Transition
+        function navigateTo(url) {
+            const curtain = document.getElementById('loadingCurtain');
+            curtain.classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = url;
+            }, 450);
+        }
+
+        // Context Menu & Drag Protection
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+        // F12 Protection
+        let isModalActive = false;
+        function triggerF12Warning() {
+            if (isModalActive) return;
+            isModalActive = true;
+
+            const modal = document.getElementById('f12Modal');
+            const progressBar = document.getElementById('modalProgress');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+            modal.querySelector('div').classList.remove('scale-90');
+            modal.querySelector('div').classList.add('scale-100');
+
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+            }, 50);
+
+            setTimeout(() => {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.querySelector('div').classList.remove('scale-100');
+                modal.querySelector('div').classList.add('scale-90');
+                isModalActive = false;
+            }, 3000);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+                (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
+            ) {
+                e.preventDefault();
+                triggerF12Warning();
+            }
+        });
+    </script>
+</body>
+</html>
