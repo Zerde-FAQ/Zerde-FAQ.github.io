@@ -22,7 +22,7 @@
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #ffffff; /* Чисто белый фон */
+            background-color: #ffffff;
             color: #1e293b;
             min-height: 100vh;
             overflow-x: hidden;
@@ -75,7 +75,7 @@
         }
         .rotating-ornament {
             animation: spinOrnament 40s linear infinite;
-            mix-blend-mode: multiply; /* Хромакей белого фона */
+            mix-blend-mode: multiply;
             filter: contrast(110%);
         }
 
@@ -149,6 +149,26 @@
         </div>
     </div>
 
+    <!-- Image Zoom Modal (Minimalist) -->
+    <div id="imageModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300 p-3 sm:p-6">
+        <!-- Toolbar -->
+        <div class="bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl shadow-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-3 border border-slate-200 z-10 max-w-lg w-full">
+            <button onclick="zoomModalImage(0.25)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition-colors cursor-pointer" title="Үлкейту"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Үлкейту</button>
+            <button onclick="zoomModalImage(-0.25)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition-colors cursor-pointer" title="Кішірейту"><i class="fa-solid fa-magnifying-glass-minus mr-1"></i> Кішірейту</button>
+            <button onclick="resetZoom()" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-medium transition-colors cursor-pointer">Бастапқы</button>
+            
+            <div class="h-6 w-[1px] bg-slate-300 mx-1"></div>
+
+            <button onclick="saveModalImage()" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-medium shadow-md shadow-blue-500/20 transition-all cursor-pointer"><i class="fa-solid fa-download mr-1"></i> Сақтау</button>
+            <button onclick="closeImageModal()" class="w-8 h-8 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-full flex items-center justify-center transition-colors cursor-pointer ml-auto"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Image Container -->
+        <div id="imageWrapper" class="relative overflow-auto max-w-full max-h-[75vh] rounded-2xl shadow-2xl bg-white border border-slate-200 flex items-center justify-center p-4">
+            <img id="modalImage" src="" alt="Жауап" class="transition-transform duration-200 object-contain max-h-[70vh] origin-center">
+        </div>
+    </div>
+
     <!-- Extra Large Rotating Kazakh Ornament (ojy.jpg) -->
     <div class="fixed -bottom-24 -left-24 sm:-bottom-32 sm:-left-32 md:-bottom-40 md:-left-40 z-0 pointer-events-none opacity-75">
         <img src="ojy.jpg" alt="Қазақ орнаменті" class="w-[350px] h-[350px] sm:w-[500px] sm:h-[500px] md:w-[650px] md:h-[650px] object-contain rotating-ornament" onerror="this.style.display='none';">
@@ -175,16 +195,16 @@
 
     <!-- Main Content Container -->
     <main class="w-full max-w-7xl mx-auto flex flex-col items-center my-auto py-2 relative z-10">
-        
-        <!-- Self-Typing Title (Roboto, size 24+ on desktop) -->
+
+        <!-- Self-Typing Title -->
         <h1 id="typingTitle" class="text-2xl sm:text-3xl md:text-[28px] font-bold text-slate-800 mb-8 tracking-tight text-center typing-cursor">
             1 Модуль - Жауап
         </h1>
 
         <!-- Cards Viewport with Navigation Arrows -->
         <div class="relative w-full flex items-center justify-center px-6 sm:px-12">
-            
-            <!-- Left Arrow Button (Mobile Adapted) -->
+
+            <!-- Left Arrow Button -->
             <button onclick="prevPage()" class="absolute left-0 z-20 clean-glass w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-blue-600 shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer">
                 <i class="fa-solid fa-chevron-left text-base sm:text-xl"></i>
             </button>
@@ -194,7 +214,7 @@
                 <!-- Dynamically injected with animation -->
             </div>
 
-            <!-- Right Arrow Button (Mobile Adapted) -->
+            <!-- Right Arrow Button -->
             <button onclick="nextPage()" class="absolute right-0 z-20 clean-glass w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-blue-600 shadow-md hover:scale-110 active:scale-95 transition-all cursor-pointer">
                 <i class="fa-solid fa-chevron-right text-base sm:text-xl"></i>
             </button>
@@ -220,8 +240,8 @@
         // Start Background Music (km.wav) at 20% Volume with browser unlock logic
         window.addEventListener('load', () => {
             const bgMusic = document.getElementById('bgMusic');
-            bgMusic.volume = 0.2; // Мягкие 20% громкости
-            
+            bgMusic.volume = 0.2;
+
             const startMusic = () => {
                 bgMusic.play().then(() => {
                     document.removeEventListener('click', startMusic);
@@ -254,17 +274,17 @@
         }
         window.addEventListener('load', typeTitle);
 
-        // Pages data structures
+        // Pages data structures with answer images mapped properly
         const pagesData = [
             [
-                { img: 'm1/1.png', audio: 1 },
-                { img: 'm2/1.png', audio: 2 },
-                { img: 'm3/1.png', audio: 3 }
+                { img: 'm1/1.png', answerImg: 'm1/2.png', audio: 1 },
+                { img: 'm2/1.png', answerImg: 'm2/2.jpeg', audio: 2 },
+                { img: 'm3/1.png', answerImg: 'm3/2.jpeg', audio: 3 }
             ],
             [
-                { img: 'm4/1.png', audio: 4 },
-                { img: 'm1/1.png', audio: 1 },
-                { img: 'm2/1.png', audio: 2 }
+                { img: 'm4/1.png', answerImg: 'm4/2.jpeg', audio: 4 },
+                { img: 'm1/1.png', answerImg: 'm1/2.png', audio: 1 },
+                { img: 'm2/1.png', answerImg: 'm2/2.jpeg', audio: 2 }
             ]
         ];
 
@@ -273,7 +293,7 @@
         function renderPages() {
             const grid = document.getElementById('cardsGrid');
             const dotsContainer = document.getElementById('dotsContainer');
-            
+
             grid.innerHTML = '';
             dotsContainer.innerHTML = '';
 
@@ -285,10 +305,21 @@
             currentCards.forEach((cardData) => {
                 grid.innerHTML += `
                     <div class="clean-card rounded-[28px] p-5 flex flex-col items-center justify-between shadow-xl relative overflow-hidden group hover:scale-[1.02]">
-                        <img src="${cardData.img}" alt="Card ${cardData.audio}" class="w-full h-auto object-contain rounded-2xl shadow-sm mb-4 pointer-events-none" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x300&data=Missing+${cardData.img}';">
-                        <div class="w-full flex justify-end px-2 pb-1">
-                            <button onclick="playAudio(${cardData.audio}, this)" class="w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30 hover:bg-blue-700 active:scale-95 transition-all cursor-pointer">
-                                <i class="fa-solid fa-volume-high text-xl"></i>
+                        <img src="${cardData.img}" alt="Card ${cardData.audio}" class="w-full h-auto object-contain rounded-2xl shadow-sm mb-3 pointer-events-none" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x300&data=Missing+${cardData.img}';">
+
+                        <!-- Smooth Answer Container -->
+                        <div class="answer-container w-full max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0 mb-3">
+                            <img src="${cardData.answerImg}" alt="Жауап" onclick="openImageModal('${cardData.answerImg}')" class="w-full h-auto object-contain rounded-2xl shadow-sm border border-emerald-200 cursor-zoom-in hover:brightness-105 transition-all" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x300&data=Missing+${cardData.answerImg}';">
+                        </div>
+
+                        <div class="w-full flex justify-between items-center px-2 pt-2 border-t border-slate-100">
+                            <!-- Green Жауап Button -->
+                            <button onclick="toggleAnswer(this)" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-medium text-sm flex items-center shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer">
+                                <i class="fa-solid fa-eye mr-2"></i> Жауап
+                            </button>
+                            <!-- Audio Button -->
+                            <button onclick="playAudio(${cardData.audio}, this)" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30 hover:bg-blue-700 active:scale-95 transition-all cursor-pointer">
+                                <i class="fa-solid fa-volume-high text-lg"></i>
                             </button>
                         </div>
                     </div>
@@ -300,6 +331,63 @@
                     <button onclick="goToPage(${pIdx})" class="h-3 rounded-full transition-all duration-300 ${pIdx === currentPage ? 'bg-blue-600 w-8' : 'bg-slate-300 w-3'}"></button>
                 `;
             });
+        }
+
+        // Toggle Answer Function
+        function toggleAnswer(btn) {
+            const card = btn.closest('.clean-card');
+            const answerContainer = card.querySelector('.answer-container');
+            const isOpen = answerContainer.style.maxHeight && answerContainer.style.maxHeight !== '0px';
+
+            if (isOpen) {
+                answerContainer.style.maxHeight = '0px';
+                answerContainer.style.opacity = '0';
+                btn.innerHTML = '<i class="fa-solid fa-eye mr-2"></i> Жауап';
+                btn.classList.remove('bg-emerald-700');
+                btn.classList.add('bg-emerald-600');
+            } else {
+                answerContainer.style.maxHeight = '600px';
+                answerContainer.style.opacity = '1';
+                btn.innerHTML = '<i class="fa-solid fa-eye-slash mr-2"></i> Жасыру';
+                btn.classList.remove('bg-emerald-600');
+                btn.classList.add('bg-emerald-700');
+            }
+        }
+
+        // --- Image Zoom Modal Logic ---
+        const imageModal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        let currentScale = 1;
+
+        function openImageModal(imgSrc) {
+            modalImg.src = imgSrc;
+            currentScale = 1;
+            modalImg.style.transform = `scale(${currentScale})`;
+            imageModal.classList.remove('opacity-0', 'pointer-events-none');
+            imageModal.classList.add('opacity-100');
+        }
+
+        function closeImageModal() {
+            imageModal.classList.remove('opacity-100');
+            imageModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function zoomModalImage(delta) {
+            currentScale = Math.max(0.5, Math.min(3.0, currentScale + delta));
+            modalImg.style.transform = `scale(${currentScale})`;
+        }
+
+        function resetZoom() {
+            currentScale = 1;
+            modalImg.style.transform = `scale(${currentScale})`;
+        }
+
+        function saveModalImage() {
+            const link = document.createElement('a');
+            link.download = 'jawap-image.png';
+            link.href = modalImg.src;
+            link.click();
+            showToast("Сурет сәтті сақталды! 📥");
         }
 
         function nextPage() {
@@ -337,10 +425,10 @@
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toast-message');
             msgEl.textContent = message;
-            
+
             toast.classList.remove('translate-y-[-150%]', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
-            
+
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-[-150%]', 'opacity-0');
@@ -350,11 +438,10 @@
         // Active Audio State Management
         let activeAudio = null;
 
-        // 100% Volume Audio Playback with Smart Protection & Shake/Red Flash Animation
         function playAudio(num, btnElement) {
             if (activeAudio && !activeAudio.paused && !activeAudio.ended) {
                 showToast("Ағымдағы аудиофайл аяқталғанша күтіңіз.");
-                
+
                 btnElement.classList.add('shake-error');
                 setTimeout(() => {
                     btnElement.classList.remove('shake-error');
@@ -375,7 +462,7 @@
                     showToast(`${num}-аудио файл ойнатылуда 🎧`);
                 }).catch(err => {
                     console.log("Audio error:", err);
-                    showToast("Аудио файлды ойнату мүмкін болмады", false);
+                    showToast("Аудио файлды ойнату мүмкін болмады");
                     activeAudio = null;
                 });
 
@@ -398,19 +485,16 @@
             const modal = document.getElementById('f12Modal');
             const progressBar = document.getElementById('modalProgress');
 
-            // Show modal
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
             modal.querySelector('div').classList.remove('scale-90');
             modal.querySelector('div').classList.add('scale-100');
 
-            // Start Progress bar
             progressBar.style.width = '100%';
             setTimeout(() => {
                 progressBar.style.width = '0%';
             }, 50);
 
-            // Hide modal after 3 seconds
             setTimeout(() => {
                 modal.classList.remove('opacity-100');
                 modal.classList.add('opacity-0', 'pointer-events-none');
